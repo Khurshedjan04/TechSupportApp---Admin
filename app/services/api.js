@@ -1,5 +1,5 @@
 // API base configuration
-const API_BASE_URL = "https://techsupport-backend.onrender.com/api";
+const API_BASE_URL = "http://localhost:5000/api";
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {

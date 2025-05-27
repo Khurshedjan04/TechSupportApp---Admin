@@ -51,7 +51,6 @@ export default function AdminCustomers() {
 
     try {
       const requests = await usersAPI.getAllUsers();
-      console.log("Fetched users:", requests);
       dispatch(setUsers(requests));
     } catch (error) {
       dispatch(setError(error.message));

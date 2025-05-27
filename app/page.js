@@ -19,7 +19,8 @@ import {
   setLoading as setQuoteLoading,
   setQuoteRequests,
 } from "./store/slices/quoteRequestsSlice";
-import { quoteRequestsAPI, supportRequestsAPI } from "./services/api";
+import { quoteRequestsAPI, supportRequestsAPI, usersAPI } from "./services/api";
+import { setUsers } from "./store/slices/usersSlice";
 
 export default function AdminDashboard() {
   useAuthCheck();
@@ -31,10 +32,26 @@ export default function AdminDashboard() {
   const { supportRequests, loading, stats, filters } = useSelector(
     (state) => state.supportRequests
   );
+  const { users } = useSelector((state) => state.users);
+
   const [tickets, setTickets] = useState([]);
   useEffect(() => {
     loadSupportRequests();
+    loadQuoteRequests();
+    loadUsers();
   }, []);
+
+  const loadUsers = async () => {
+    dispatch(setLoading(true));
+
+    try {
+      const requests = await usersAPI.getAllUsers();
+      dispatch(setUsers(requests));
+      console.log(users);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const loadSupportRequests = async () => {
     dispatch(setLoading(true));
@@ -55,22 +72,17 @@ export default function AdminDashboard() {
   const { quoteRequests } = useSelector((state) => state.quoteRequests);
   const [quotes, setquotes] = useState([]);
 
-  useEffect(() => {
-    loadQuoteRequests();
-  }, []);
-
   const loadQuoteRequests = async () => {
     dispatch(setQuoteLoading(true));
 
     try {
       const requests = await quoteRequestsAPI.getAllQuotes();
+      console.log("QUOTE REQUESTS:", requests);
       dispatch(setQuoteRequests(requests));
     } catch (error) {
       dispatch(setQuoteError(error.message));
     }
   };
-
-  console.log(quoteRequests);
 
   useEffect(() => {
     setquotes(quoteRequests);

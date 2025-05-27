@@ -24,6 +24,7 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
   const navigation = [
     { name: "Dashboard", href: "/", icon: HomeIcon },
     { name: "Support Tickets", href: "/tickets", icon: TicketIcon },
+    { name: "Quotes", href: "/quotes", icon: TicketIcon },
     { name: "Customers", href: "/customers", icon: UserGroupIcon },
     { name: "Staff", href: "/staff", icon: UserGroupIcon },
     { name: "Inventory", href: "/inventory", icon: WrenchScrewdriverIcon },

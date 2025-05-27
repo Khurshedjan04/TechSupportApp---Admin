@@ -10,22 +10,22 @@ import {
 import AdminLayout from "../AdminLayout";
 import useAuthCheck from "../hooks/checkAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { supportRequestsAPI, usersAPI } from "../services/api";
+import { quoteRequestsAPI, usersAPI } from "../services/api";
 import {
-  deleteSupportRequest,
+  deleteQuoteRequest,
   setError,
   setLoading,
-  setSupportRequests,
-  updateSupportRequest,
-} from "../store/slices/supportRequestsSlice";
+  setQuoteRequests,
+  updateQuoteRequest,
+} from "../store/slices/quoteRequestsSlice";
 import { setUsers } from "../store/slices/usersSlice";
 
 export default function AdminTickets() {
   useAuthCheck();
   const dispatch = useDispatch();
 
-  const { supportRequests, error, loading, stats, filters } = useSelector(
-    (state) => state.supportRequests
+  const { quoteRequests, error, loading, stats, filters } = useSelector(
+    (state) => state.quoteRequests
   );
   const technicians = useSelector((state) =>
     state.users.users.filter((user) => user.role === "technician")
@@ -33,7 +33,7 @@ export default function AdminTickets() {
 
   useEffect(() => {
     loadUsers();
-    loadSupportRequests();
+    loadQuoteRequests();
   }, []);
 
   const loadUsers = async () => {
@@ -52,15 +52,15 @@ export default function AdminTickets() {
     confirm(error);
     dispatch(setError(null));
   }
-  // support requests
+  // quote requests
   const [tickets, setTickets] = useState([]);
 
-  const loadSupportRequests = async () => {
+  const loadQuoteRequests = async () => {
     dispatch(setLoading(true));
 
     try {
-      const requests = await supportRequestsAPI.getAllRequests();
-      dispatch(setSupportRequests(requests));
+      const requests = await quoteRequestsAPI.getAllQuotes();
+      dispatch(setQuoteRequests(requests));
     } catch (error) {
       dispatch(setError(error));
     }
@@ -68,16 +68,17 @@ export default function AdminTickets() {
 
   const deleteTicket = async (activeTicketId) => {
     try {
-      const requests = await supportRequestsAPI.deleteRequest(activeTicketId);
-      dispatch(deleteSupportRequest(activeTicketId));
+      const requests = await quoteRequestsAPI.deleteQuote(activeTicketId);
+      dispatch(deleteQuoteRequest(activeTicketId));
     } catch (error) {
       dispatch(setError(error));
     }
   };
 
   useEffect(() => {
-    setTickets(supportRequests);
-  }, [supportRequests]);
+    setTickets(quoteRequests);
+    console.log(quoteRequests);
+  }, [quoteRequests]);
 
   const [selectedTicket, setSelectedTicket] = useState({});
   const [newStatus, setNewStatus] = useState(
@@ -101,13 +102,11 @@ export default function AdminTickets() {
 
   const getPriorityColor = (priority = "medium") => {
     switch (priority.toLowerCase()) {
-      case "critical":
+      case "express":
         return "bg-red-100 text-red-800";
-      case "high":
-        return "bg-orange-100 text-orange-800";
-      case "medium":
+      case "standard":
         return "bg-yellow-100 text-yellow-800";
-      case "low":
+      case "sameDay":
         return "bg-green-100 text-green-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -115,13 +114,16 @@ export default function AdminTickets() {
   };
 
   const getStatusColor = (status) => {
+    'pending', 'reviewed', 'quoted', 'accepted', 'declined'
     switch (status.toLowerCase()) {
-      case "resolved":
-        return "bg-green-100 text-green-800";
-      case "scheduled":
-        return "bg-blue-100 text-blue-800";
-      case "open":
+      case "pending":
         return "bg-yellow-100 text-yellow-800";
+      case "reviewed":
+        return "bg-orange-100 text-orange-800";
+      case "quoted":
+        return "bg-blue-100 text-blue-800";
+      case "accepted":
+        return "bg-green-100 text-green-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -130,7 +132,7 @@ export default function AdminTickets() {
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
       ticket.userId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ticket._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       ticket.issue.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPriority =
       priorityFilter === "all" ||
@@ -148,19 +150,17 @@ export default function AdminTickets() {
 
   const handleUpdateTicketStatus = async (ticketId) => {
     try {
-      await supportRequestsAPI.updateRequest(ticketId, {
+      await quoteRequestsAPI.updateQuote(ticketId, {
         status: newStatus,
         assignedTechnic: newAssign,
       });
-
       dispatch(
-        updateSupportRequest({
+        updateQuoteRequest({
           _id: ticketId,
           status: newStatus,
           assignedTechnic: newAssign,
         })
       );
-
       setShowTicketModal(false);
     } catch (error) {
       dispatch(setError(error.message));
@@ -216,76 +216,52 @@ export default function AdminTickets() {
       </div>
 
       {/* Tickets Table */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-md">
-        <ul className="divide-y divide-gray-200">
-          {filteredTickets.map((ticket) => (
-            <li key={ticket?._id}>
-              <div className="px-4 py-4 sm:px-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                        <UserIcon className="h-6 w-6 text-gray-600" />
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <div className="flex items-center text-sm text-gray-500">
-                        <p>
-                          {ticket?.userId.name} ({ticket?.userId.accType})
-                        </p>
-                        <p className="ml-2">
-                          ||{" "}
-                          {ticket?.device.charAt(0).toUpperCase() +
-                            ticket.device?.slice(1)}
-                        </p>
-                      </div>
-                    </div>
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Quotes
+          </h3>
+          <div className="space-y-4">
+            {tickets.map((quote) => (
+              <div
+                key={quote?.id}
+                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+              >
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900">
+                    {quote?.userId?.name}
+                  </h4>
+                  <div className="flex">
+                    <p className="text-sm text-gray-500">
+                      {quote?.serviceType}{"  "}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {" "}
+                      || {quote.timeline}
+                    </p>
                   </div>
-                  <div className="flex items-center space-x-2">
+                </div>
+                <div className="text-right">
+                <div className="flex items-center space-x-2">
                     <button
-                      onClick={() => handleViewTicket(ticket)}
+                      onClick={() => handleViewTicket(quote)}
                       className="text-blue-600 hover:text-blue-900"
                     >
                       <EyeIcon className="h-5 w-5" />
                     </button>
                     <button
-                      onClick={() => deleteTicket(ticket?._id)}
+                      onClick={() => deleteTicket(quote?._id)}
                       className="text-red-600 hover:text-red-900"
                     >
                       <TrashIcon className="h-5 w-5" />
                     </button>
                   </div>
                 </div>
-                <div className="mt-2">
-                  <p className="text-sm text-gray-600">{ticket?.issue}</p>
-                </div>
-                <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-                  <div className="flex items-center space-x-4">
-                    <span>
-                      Created: {new Date(ticket?.createdAt).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <span
-                      className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityColor(
-                        ticket?.urgency
-                      )}`}
-                    >
-                      {ticket?.urgency}
-                    </span>
-                    <span
-                      className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                        ticket?.status
-                      )}`}
-                    >
-                      {ticket?.status}
-                    </span>
-                  </div>
-                </div>
               </div>
-            </li>
-          ))}
-        </ul>
+            ))}
+          </div>
+          <div className="mt-6"></div>
+        </div>
       </div>
 
       {/* Ticket Detail Modal */}
@@ -295,7 +271,7 @@ export default function AdminTickets() {
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
-                  Ticket Details - {selectedTicket._id}
+                  Quote Details - {selectedTicket._id}
                 </h3>
                 <button
                   onClick={() => setShowTicketModal(false)}
@@ -340,20 +316,20 @@ export default function AdminTickets() {
 
                 <div>
                   <h4 className="text-sm font-medium text-gray-600 mb-3">
-                    Ticket Information
+                    Quote Information
                   </h4>
                   <div className="space-y-2 text-sm">
                     <p className="font-medium text-gray-600">
-                      <span>Device:</span> {selectedTicket.device}
+                      <span>Service Type:</span> {selectedTicket.serviceType}
                     </p>
                     <p>
                       <span className="font-medium">Priority:</span>
                       <span
                         className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                          selectedTicket.urgency
+                          selectedTicket.timeline
                         )}`}
                       >
-                        {selectedTicket.urgency}
+                        {selectedTicket.timeline}
                       </span>
                     </p>
                     <p>
@@ -369,16 +345,6 @@ export default function AdminTickets() {
                   </div>
                 </div>
               </div>
-
-              <div className="mt-6">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">
-                  Issue Description
-                </h4>
-                <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
-                  {selectedTicket.issue}
-                </p>
-              </div>
-
               <div className="mt-6">
                 <h4 className="text-sm font-medium text-gray-900 mb-3">
                   Timeline
@@ -427,15 +393,27 @@ export default function AdminTickets() {
                   </button>
                   <button
                     onClick={() => setNewStatus("scheduled")}
-                    className="bg-green-100 text-green-800 px-3 py-1 rounded text-sm hover:bg-green-200"
+                    className="bg-yellow-100 text-green-800 px-3 py-1 rounded text-sm hover:bg-green-200"
                   >
-                    Scheduled
+                    Reviewed
                   </button>
                   <button
-                    onClick={() => setNewStatus("resolved")}
-                    className="bg-purple-100 text-purple-800 px-3 py-1 rounded text-sm hover:bg-purple-200"
+                    onClick={() => setNewStatus("reviewed")}
+                    className="bg-orange-100 text-orange-800 px-3 py-1 rounded text-sm hover:bg-purple-200"
                   >
-                    Resolved
+                    Quoted
+                  </button>
+                  <button
+                    onClick={() => setNewStatus("quoted")}
+                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm hover:bg-purple-200"
+                  >
+                    Accepted
+                  </button>
+                  <button
+                    onClick={() => setNewStatus("accepted")}
+                    className="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm hover:bg-purple-200"
+                  >
+                    Declined
                   </button>
                 </div>
               </div>
