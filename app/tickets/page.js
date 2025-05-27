@@ -286,11 +286,11 @@ export default function AdminTickets() {
                     </p>
                     <p>
                       <span className="font-medium">Type:</span>{" "}
-                      {selectedTicket.userType}
+                      {selectedTicket?.userId?.accType}
                     </p>
                     <p>
                       <span className="font-medium">Email:</span>{" "}
-                      {selectedTicket.userId.name}
+                      {selectedTicket.userId.email}
                     </p>
                   </div>
                 </div>
@@ -390,7 +390,8 @@ export default function AdminTickets() {
                 </button>
                 <button
                   onClick={() =>
-                    handleUpdateTicketStatus(selectedTicket._id, newStatus)
+                  {  handleUpdateTicketStatus(selectedTicket._id, newStatus), console.log(selectedTicket);
+                  }
                   }
                   className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
                 >
@@ -405,7 +406,7 @@ export default function AdminTickets() {
       {filteredTickets.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">
-            No tickets found matching your criteria.
+            No tickets found!
           </p>
         </div>
       )}

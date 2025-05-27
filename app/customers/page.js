@@ -17,9 +17,14 @@ export default function AdminCustomers() {
 
   useAuthCheck();
 
-  const { users, loading, stats, filters } = useSelector(
+  const { users, error, loading, stats, filters } = useSelector(
     (state) => state.users
   );
+
+  if (error) {
+    confirm(error);
+    dispatch(setError(null));
+  }
 
   const [currentUsers, setUser] = useState([]);
   useEffect(() => {
