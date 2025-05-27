@@ -392,25 +392,25 @@ export default function AdminTickets() {
                     Pending
                   </button>
                   <button
-                    onClick={() => setNewStatus("scheduled")}
+                    onClick={() => setNewStatus("reviewed")}
                     className="bg-yellow-100 text-green-800 px-3 py-1 rounded text-sm hover:bg-green-200"
                   >
                     Reviewed
                   </button>
                   <button
-                    onClick={() => setNewStatus("reviewed")}
+                    onClick={() => setNewStatus("quoted")}
                     className="bg-orange-100 text-orange-800 px-3 py-1 rounded text-sm hover:bg-purple-200"
                   >
                     Quoted
                   </button>
                   <button
-                    onClick={() => setNewStatus("quoted")}
+                    onClick={() => setNewStatus("accepted")}
                     className="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm hover:bg-purple-200"
                   >
                     Accepted
                   </button>
                   <button
-                    onClick={() => setNewStatus("accepted")}
+                    onClick={() => setNewStatus("declined")}
                     className="bg-gray-100 text-gray-800 px-3 py-1 rounded text-sm hover:bg-purple-200"
                   >
                     Declined
