@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout, loginSuccess } from "../store/slices/authSlice";
 import { authAPI } from "../services/api";
 
-const useAuthCheck = () => {
+const useAuthCheck = (forTheck = "technician") => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isAuthenticated, loading } = useSelector((state) => state.auth);
@@ -18,10 +18,12 @@ const useAuthCheck = () => {
         router.push("/login");
         return;
       }
-
       try {
         const user = await authAPI.getMe();
-        if (user.role === "user") {
+        if(user.role === forTheck){
+          router.push("/technician");
+        }
+        if (user.role === "user" ) {
           alert("You do not have access to Admin Panel");
           dispatch(logout());
           return;

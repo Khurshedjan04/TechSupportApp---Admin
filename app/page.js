@@ -210,7 +210,7 @@ export default function AdminDashboard() {
             <div className="flow-root">
               <ul className="-mb-8">
                 {tickets.map((ticket, index) => (
-                  <li key={ticket?.id}>
+                  <li key={ticket?._id}>
                     <div className="relative pb-8">
                       <div className="relative flex items-start space-x-3">
                         <div className="relative">
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {quoteRequests.map((quote) => (
                 <div
-                  key={quote?.id}
+                  key={quote?._id}
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                 >
                   <div>

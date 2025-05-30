@@ -21,7 +21,7 @@ import {
 import { setUsers } from "../store/slices/usersSlice";
 
 export default function AdminTickets() {
-  useAuthCheck();
+  useAuthCheck('admin');
   const dispatch = useDispatch();
 
   const { supportRequests, error, loading, stats, filters } = useSelector(

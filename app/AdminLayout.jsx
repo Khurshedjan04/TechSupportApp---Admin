@@ -21,14 +21,29 @@ export default function AdminLayout({ children, title = "Admin Dashboard" }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
-  const navigation = [
-    { name: "Dashboard", href: "/", icon: HomeIcon },
-    { name: "Support Tickets", href: "/tickets", icon: TicketIcon },
-    { name: "Quotes", href: "/quotes", icon: TicketIcon },
-    { name: "Customers", href: "/customers", icon: UserGroupIcon },
-    { name: "Staff", href: "/staff", icon: UserGroupIcon },
-    { name: "Inventory", href: "/inventory", icon: WrenchScrewdriverIcon },
-  ];
+  const navigation =
+    user?.role === "technician"
+      ? [
+          { name: "My Dashboard", href: "/technician", icon: HomeIcon },
+          {
+            name: "Inventory",
+            href: "/inventory",
+            icon: WrenchScrewdriverIcon,
+          },
+          { name: "Dashboard", href: "/", icon: HomeIcon },
+        ]
+      : [
+          { name: "Dashboard", href: "/", icon: HomeIcon },
+          { name: "Support Tickets", href: "/tickets", icon: TicketIcon },
+          { name: "Quotes", href: "/quotes", icon: TicketIcon },
+          { name: "Customers", href: "/customers", icon: UserGroupIcon },
+          { name: "Staff", href: "/staff", icon: UserGroupIcon },
+          {
+            name: "Inventory",
+            href: "/inventory",
+            icon: WrenchScrewdriverIcon,
+          },
+        ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -166,9 +181,14 @@ function SidebarContent({ navigation, currentPath }) {
           })}
           <button
             disabled={loading}
-            onClick={() => {dispatch(logout()); router.push("/login")}}
+            onClick={() => {
+              dispatch(logout());
+              router.push("/login");
+            }}
             className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-2 rounded-md hover:opacity-90 transition"
-          >Logout</button>
+          >
+            Logout
+          </button>
         </nav>
       </div>
     </>

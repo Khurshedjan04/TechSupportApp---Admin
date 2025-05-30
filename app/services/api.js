@@ -1,5 +1,5 @@
 // API base configuration
-const API_BASE_URL = "https://techsupport-backend.onrender.com/api";
+const API_BASE_URL = "http://localhost:5000/api";
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
@@ -81,6 +81,11 @@ export const supportRequestsAPI = {
       method: "PUT",
       body: JSON.stringify(updateData),
     }),
+  updateRequestbyTechnician: (requestId, updateData) =>
+    apiCall(`/requests/tech/${requestId}`, {
+      method: "PUT",
+      body: JSON.stringify(updateData),
+    }),
 
   deleteRequest: (requestId) =>
     apiCall(`/supportRequests/${requestId}`, {
@@ -104,8 +109,50 @@ export const quoteRequestsAPI = {
       body: JSON.stringify(updateData),
     }),
 
+  updateQuotebyTech: (quoteId, updateData) =>
+    apiCall(`/quoteRequests/tech/${quoteId}`, {
+      method: "PUT",
+      body: JSON.stringify(updateData),
+    }),
+
   deleteQuote: (quoteId) =>
     apiCall(`/quoteRequests/${quoteId}`, {
       method: "DELETE",
     }),
 };
+
+// Inventory API calls
+export const inventoryAPI = {
+  // Get all inventory items (Admin & Technician)
+  getAllInventoryItems: () => apiCall("/inventory"),
+
+  // Get low stock items (Admin & Technician)
+  getLowStockItems: () => apiCall("/inventory/low-stock"),
+
+  // Create new inventory item (Admin only)
+  createInventoryItem: (itemData) =>
+    apiCall("/inventory", {
+      method: "POST",
+      body: JSON.stringify(itemData),
+    }),
+
+  // Update inventory item by ID (Admin only)
+  updateInventoryItem: (itemId, updateData) =>
+    apiCall(`/inventory/${itemId}`, {
+      method: "PUT",
+      body: JSON.stringify(updateData),
+    }),
+
+  // Delete inventory item by ID (Admin only)
+  deleteInventoryItem: (itemId) =>
+    apiCall(`/inventory/${itemId}`, {
+      method: "DELETE",
+    }),
+
+  // Decrement inventory item by 1 (Admin & Technician)
+  decrementInventoryItem: (itemId) =>
+    apiCall(`/inventory/${itemId}/decrement`, {
+      method: "PATCH",
+    }),
+};
+

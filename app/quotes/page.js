@@ -21,7 +21,7 @@ import {
 import { setUsers } from "../store/slices/usersSlice";
 
 export default function AdminTickets() {
-  useAuthCheck();
+  useAuthCheck('admin');
   const dispatch = useDispatch();
 
   const { quoteRequests, error, loading, stats, filters } = useSelector(
@@ -114,7 +114,7 @@ export default function AdminTickets() {
   };
 
   const getStatusColor = (status) => {
-    'pending', 'reviewed', 'quoted', 'accepted', 'declined'
+    "pending", "reviewed", "quoted", "accepted", "declined";
     switch (status.toLowerCase()) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
@@ -131,12 +131,12 @@ export default function AdminTickets() {
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
-      ticket.userId.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.issue.toLowerCase().includes(searchTerm.toLowerCase());
+      ticket?.userId?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ticket?._id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ticket?.issue?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPriority =
       priorityFilter === "all" ||
-      ticket.urgency.toLowerCase() === priorityFilter;
+      ticket?.urgency.toLowerCase() === priorityFilter;
 
     return matchesSearch && matchesPriority;
   });
@@ -169,7 +169,7 @@ export default function AdminTickets() {
   };
 
   return (
-    <AdminLayout title="Support Tickets">
+    <AdminLayout title="Quote Tickets">
       {/* Filters and Search */}
       <div className="mb-6 bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -233,16 +233,23 @@ export default function AdminTickets() {
                   </h4>
                   <div className="flex">
                     <p className="text-sm text-gray-500">
-                      {quote?.serviceType}{"  "}
+                      {quote?.serviceType}
+                      {"  "}
                     </p>
                     <p className="text-sm text-gray-500">
                       {" "}
-                      || {quote.timeline}
+                      || {quote?.timeline}
                     </p>
                   </div>
                 </div>
+                <div className="flex px-5 text-black flex-1 justify-end">
+                  <h1>
+                    {quote?.status.charAt(0).toUpperCase() +
+                      quote.status?.slice(1)}
+                  </h1>
+                </div>
                 <div className="text-right">
-                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleViewTicket(quote)}
                       className="text-blue-600 hover:text-blue-900"
@@ -301,7 +308,7 @@ export default function AdminTickets() {
                   <div className="space-y-2 text-sm text-gray-600">
                     <p>
                       <span className="font-medium">Name:</span>{" "}
-                      {selectedTicket.userId.name}
+                      {selectedTicket?.userId?.name}
                     </p>
                     <p>
                       <span className="font-medium">Type:</span>{" "}
@@ -309,7 +316,7 @@ export default function AdminTickets() {
                     </p>
                     <p>
                       <span className="font-medium">Email:</span>{" "}
-                      {selectedTicket.userId.email}
+                      {selectedTicket?.userId?.email}
                     </p>
                   </div>
                 </div>
@@ -320,26 +327,26 @@ export default function AdminTickets() {
                   </h4>
                   <div className="space-y-2 text-sm">
                     <p className="font-medium text-gray-600">
-                      <span>Service Type:</span> {selectedTicket.serviceType}
+                      <span>Service Type:</span> {selectedTicket?.serviceType}
                     </p>
                     <p>
                       <span className="font-medium">Priority:</span>
                       <span
                         className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                          selectedTicket.timeline
+                          selectedTicket?.timeline
                         )}`}
                       >
-                        {selectedTicket.timeline}
+                        {selectedTicket?.timeline}
                       </span>
                     </p>
                     <p>
                       <span className="font-medium">Status:</span>
                       <span
                         className={`ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          selectedTicket.status
+                          selectedTicket?.status
                         )}`}
                       >
-                        {selectedTicket.status}
+                        {selectedTicket?.status}
                       </span>
                     </p>
                   </div>
@@ -352,14 +359,16 @@ export default function AdminTickets() {
                 <div className="text-sm text-gray-600 space-y-1">
                   <p>
                     Created:{" "}
-                    {new Date(selectedTicket.createdAt).toLocaleString()}
+                    {new Date(selectedTicket?.createdAt).toLocaleString()}
                   </p>
                   <p>
                     Last Update:{" "}
-                    {new Date(selectedTicket.updatedAt).toLocaleString()}
+                    {new Date(selectedTicket?.updatedAt).toLocaleString()}
                   </p>
-                  {selectedTicket.estimatedCompletion && (
-                    <p>Est. Completion: {selectedTicket.estimatedCompletion}</p>
+                  {selectedTicket?.estimatedCompletion && (
+                    <p>
+                      Est. Completion: {selectedTicket?.estimatedCompletion}
+                    </p>
                   )}
                 </div>
               </div>
@@ -374,8 +383,8 @@ export default function AdminTickets() {
                 >
                   <option value="">No one</option>
                   {technicians.map((tech) => (
-                    <option key={tech._id} value={tech._id}>
-                      {tech.name}
+                    <option key={tech?._id} value={tech?._id}>
+                      {tech?.name}
                     </option>
                   ))}
                 </select>
@@ -443,7 +452,7 @@ export default function AdminTickets() {
         </div>
       )}
 
-      {filteredTickets.length === 0 && (
+      {filteredTickets?.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">No tickets found!</p>
         </div>
